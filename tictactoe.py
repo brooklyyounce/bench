@@ -151,11 +151,24 @@ def EducatedComputerTurn(board, char):
   if(stoppablePlayerWin == False):
     ComputerTurn(board, 'O')
   else:
+    madeMove = False
     for x in range(len(possibleMoves)):
       if(AvailableSpace(board, possibleMoves[x][0], possibleMoves[x][1])):
+        madeMove = True
         board[possibleMoves[x][0]][possibleMoves[x][1]] = char
-        break
-    
+        return
+      ComputerTurn(board, 'O')
+def AskForDifficulty():
+  tryAgain = True
+  while(tryAgain):
+    ans = raw_input("\n\n**Would you like to play on EASY or HARD? - e or h: ")
+    ans = ans.strip(' ').lower()[0]
+    if(ans == 'h' or ans == 'e'):
+      tryAgain = False
+    else:
+      print "\n\n**Please. Let's try this again."
+  return ans
+  
 def GoodByeMessage():
   print "\n\n--> Bye! Thanks so much for playing..."
   print "\n\n"
@@ -184,6 +197,7 @@ board = MakeEmptyBoard()
 
 playerChar = "X"
 computerChar = "O"
+diff = AskForDifficulty()
 
 while(movesSoFar < totalMoves):
   tryAgain = True
@@ -220,7 +234,10 @@ while(movesSoFar < totalMoves):
   
     
   if(movesSoFar < totalMoves):
-    EducatedComputerTurn(board, computerChar)
+    if(diff == 'e'):
+      ComputerTurn(board, computerChar)
+    else:
+      EducatedComputerTurn(board, computerChar)
     computerWin = CheckForWin(board, computerChar)
     if(computerWin):
       DisplayBoard(board)
