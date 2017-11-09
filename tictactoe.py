@@ -102,6 +102,60 @@ def ComputerTurn(board, char):
     if(available):
       board[x][y] = char
       foundMove = True
+def EducatedComputerTurn(board, char):
+  possibleMoves = []
+  stoppablePlayerWin = False
+  moveRow = 0
+  moveCol = 0
+  for row in range(3):
+    if(board[row][0] == board[row][1] == 'X'):
+      stoppablePlayerWin = True
+      possibleMoves.append([row,2])
+    elif(board[row][1] == board[row][2] == 'X'):
+      stoppablePlayerWin = True
+      possibleMoves.append([row, 0])
+    elif(board[row][0] == board[row][2] == 'X'):
+      stoppablePlayerWin = True
+      possibleMoves.append([row, 1])
+  for col in range(3):
+    if(board[0][col] == board[1][col] == 'X'):
+      stoppablePlayerWin = True
+      possibleMoves.append([2, col])
+    elif(board[1][col] == board[2][col] == 'X'):
+      stoppablePlayerWin = True
+      possibleMoves.append([0, col])
+    elif(board[0][col] == board[2][col] == 'X'):
+      stoppablePlayerWin = True
+      possibleMoves.append([1, col])
+      
+  if(board[2][0] == board[1][1] == 'X'):
+    stoppablePlayerWin = True
+    possibleMoves.append([0, 2])
+  elif(board[1][1] == board[0][2] == 'X'):
+    stoppablePlayerWin = True
+    possibleMoves.append([2, 0])
+  elif(board[2][0] == board[0][2] == 'X'):
+    stoppablePlayerWin = True
+    possibleMoves.append([1, 1])
+    
+  if(board[0][0] == board[1][1] == 'X'):
+    stoppablePlayerWin = True
+    possibleMoves.append([2, 2])
+  elif(board[1][1] == board[2][2] == 'X'):
+    stoppablePlayerWin = True
+    possibleMoves.append([0, 0])
+  elif(board[0][0] == board[2][2] == 'X'):
+    stoppablePlayerWin = True
+    possibleMoves.append([1, 1])
+    
+  if(stoppablePlayerWin == False):
+    ComputerTurn(board, 'O')
+  else:
+    for x in range(len(possibleMoves)):
+      if(AvailableSpace(board, possibleMoves[x][0], possibleMoves[x][1])):
+        board[possibleMoves[x][0]][possibleMoves[x][1]] = char
+        break
+    
 def GoodByeMessage():
   print "\n\n--> Bye! Thanks so much for playing..."
   print "\n\n"
@@ -166,7 +220,7 @@ while(movesSoFar < totalMoves):
   
     
   if(movesSoFar < totalMoves):
-    ComputerTurn(board, computerChar)
+    EducatedComputerTurn(board, computerChar)
     computerWin = CheckForWin(board, computerChar)
     if(computerWin):
       DisplayBoard(board)
@@ -180,8 +234,3 @@ while(movesSoFar < totalMoves):
     print "\n\n***Whoops! Looks like a CAT!!"
     print "Start the game again to play some more!"
     GoodByeMessage()
-   
-
-
-
-
