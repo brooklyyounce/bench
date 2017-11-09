@@ -97,7 +97,7 @@ def DisplayFinalResults(name, masterBoard):
   print "-------------------------------------------------------------------------------"
   print "-You gonna marry: " + masterBoard[0][0]
   print "-You gonna drive: " + masterBoard[1][0]
-  print "-You gonna have this many childrens: " + masterBoard[2][0]
+  print "-You gonna have this many childrens: " + str(masterBoard[2][0])
   print "-You gonna have this job: " + masterBoard[3][0]
   print "-You gonna make this much annually: " + masterBoard[4][0]
   print "-------------------------------------------------------------------------------"
