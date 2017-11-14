@@ -156,7 +156,8 @@ def EducatedComputerTurn(board, char):
       if(AvailableSpace(board, possibleMoves[x][0], possibleMoves[x][1])):
         madeMove = True
         board[possibleMoves[x][0]][possibleMoves[x][1]] = char
-        return
+        break
+    if(madeMove == False):
       ComputerTurn(board, 'O')
 def AskForDifficulty():
   tryAgain = True
