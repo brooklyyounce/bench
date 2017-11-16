@@ -102,6 +102,7 @@ else:
   print "\n\n You lost. The poor man hung from the neck until he expired...."
   print "Dun dun dun..."
   print "X("
+  print "The word was: " + guessWord
 print "\n                       FINAL RESULTS"
 board = constructBoard(noose, hangMan, numWrongGuessesSoFar)
 displayBoard(board, secretWord, guessedLetters, wrongGuesses)
