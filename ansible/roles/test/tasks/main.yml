@@ -1,0 +1,20 @@
+- name: create dir for test application
+  become: yes
+  file:
+    path: /usr/bin/apptest/
+    recurse: yes
+    state: directory
+
+- name: Copy test application
+  copy:
+    src: files/application.jar
+    dest: /usr/bin/apptest/application.jar
+  become: yes
+
+- name: Run test application in background
+  command: "nohup java -javaagent:/usr/bin/jmx-exporter/jmx_prometheus_javaagent.jar={{ jmx_exporter_port }}:/etc/jmx-exporter/jmx-configure.yml -jar application.jar </dev/null >/dev/null 2>&1 &"
+  #required for running as background process from ansible
+  poll: 0
+  async: 2592000
+  args:
+    chdir: /usr/bin/apptest

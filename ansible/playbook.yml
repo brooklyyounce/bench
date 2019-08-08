@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  roles:
+    - node-exporter
+    - jmx-exporter
+    - test

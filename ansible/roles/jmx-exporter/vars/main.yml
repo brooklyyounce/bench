@@ -1,0 +1,6 @@
+
+---
+#default var values for jmx exporter
+jmx_exporter_port: "9300"
+jmx_exporter_version: "0.12.0"
+prometheus_jmx_sha1: "checksum"

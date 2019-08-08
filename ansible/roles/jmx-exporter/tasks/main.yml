@@ -1,0 +1,42 @@
+- name: prometheus jmx create needed directories
+  become: yes
+  file:
+    path: "{{ item }}"
+    recurse: yes
+    state: directory
+  with_items:
+  - /usr/bin/jmx-exporter
+  - /etc/jmx-exporter
+
+- name: Get checksum from maven repo
+  set_fact:
+    prometheus_jmx_sha1: "{{ lookup('url', 'https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/' + jmx_exporter_version + '/jmx_prometheus_javaagent-' + jmx_exporter_version + '.jar.sha1')}}"
+  run_once: true
+
+
+- name: get jmx-exporter jar, check the checksum
+  become: yes
+  get_url:
+    url: https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/{{ jmx_exporter_version }}/jmx_prometheus_javaagent-{{ jmx_exporter_version }}.jar
+    checksum: "sha1:{{ prometheus_jmx_sha1 }}"
+    dest: /usr/bin/jmx-exporter/jmx_prometheus_javaagent-{{ jmx_exporter_version }}.jar
+    force: no
+
+- name: create a symlink for the jmx-exporter jar
+  become: yes
+  file:
+    src: /usr/bin/jmx-exporter/jmx_prometheus_javaagent-{{ jmx_exporter_version }}.jar
+    path: /usr/bin/jmx-exporter/jmx_prometheus_javaagent.jar
+    force: yes
+    state: link
+
+- name: copy in the jmx-exporter configuration file
+  become: yes
+  copy:
+    dest: /etc/jmx-exporter/jmx-configure.yml
+    force: yes
+    src: jmx-configure.yml
+
+- name: set variable to pass into test
+  set_fact:
+    jmx_exporter_port: "{{ jmx_exporter_port }}"

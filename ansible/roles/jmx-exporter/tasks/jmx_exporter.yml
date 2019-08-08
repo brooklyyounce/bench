@@ -1,0 +1,78 @@
+---
+install node-exporter and setup user/groups
+- name: Create the jmx_exporter group
+  group:
+    name: "{{ jmx_exporter_system_group }}"
+    #system users will have a lower uid number in ps vs a regular user
+    state: present
+    system: true
+  #when: jmx_exporter_system_group != "root"
+
+- name: Create the jmx_exporter user
+  user:
+    name: "{{ jmx_exporter_system_user }}"
+    groups: "{{ jmx_exporter_system_group }}"
+    append: true
+    #no shell for this user as it is not intended to login, polite msg displays at login attempt 'This account is currently unavailable.'
+    shell: /usr/sbin/nologin
+    #system user to signify purpose for the account, this is not a regular user account
+    system: true
+    #no home directory will be created
+    createhome: false
+    home: /
+  #when: jmx_exporter_system_user != "root"
+
+
+
+## NOTE: DOES THIS NEED TO RU AS SEPARATE USER? IF STARTED AS JAVAAGENT, WOULD NEED TO RUN WITH APPLICATION USER
+
+
+- name: Download jmx_exporter binary to local folder
+  become: false
+  get_url:
+    url: "https://github.com/prometheus/jmx_exporter/releases/download/v{{ jmx_exporter_version }}/jmx_exporter-{{ jmx_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp/jmx_exporter-{{ jmx_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    checksum: "sha256:{{ jmx_exporter_checksum }}"
+  #save result of get_url
+  register: _download_binary
+  until: _download_binary is succeeded
+  retries: 5
+  delay: 2
+  #will be run on the machine running ansible?
+  delegate_to: localhost
+  #if running in check mode, this will run normally even in simulation
+  check_mode: false
+
+- name: Unpack jmx_exporter binary
+  become: false
+  unarchive:
+    src: "/tmp/jmx_exporter-{{ jmx_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp"
+    creates: "/tmp/jmx_exporter-{{ jmx_exporter_version }}.linux-{{ go_arch }}/jmx_exporter"
+  delegate_to: localhost
+  check_mode: false
+
+- name: Create /usr/local/bin
+  file:
+    path: /usr/local/bin
+    state: directory
+    mode: 0755
+
+- name: Copy in jmx_exporter binaries
+  copy:
+    src: "/tmp/jmx_exporter-{{ jmx_exporter_version }}.linux-{{ go_arch }}/jmx_exporter"
+    dest: "/usr/local/bin/jmx_exporter"
+    mode: 0755
+    #name of user that should own the file/directory
+    owner: root
+    #name of group that should own the file/directory
+    group: root
+  when: not ansible_check_mode
+
+- name: Copy in the jmx-exporter configure file
+  template:
+    src: configure.yml
+    dest: /usr/local/bin/jmx_exporter
+    owner: root
+    group: root
+    mode: 0644
